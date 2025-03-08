@@ -1,10 +1,21 @@
 "use client"
 
-import { redirect } from "next/navigation"
+import { useEffect } from "react"
+import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { ArrowRight } from "lucide-react"
 
 export default function Home() {
+  const router = useRouter()
+
+  useEffect(() => {
+    // Check if user is already logged in
+    const user = localStorage.getItem("user")
+    if (user && JSON.parse(user).isAuthenticated) {
+      router.push("/dashboard")
+    }
+  }, [router])
+
   return (
     <div className="flex min-h-screen flex-col">
       <main className="flex-1">
@@ -14,16 +25,19 @@ export default function Home() {
               <div className="flex flex-col justify-center space-y-4">
                 <div className="space-y-2">
                   <h1 className="text-3xl font-bold tracking-tighter sm:text-5xl xl:text-6xl/none">
-                    Spirit11 Admin Panel
+                    Spirit11 Fantasy Cricket
                   </h1>
                   <p className="max-w-[600px] text-gray-500 md:text-xl dark:text-gray-400">
-                    Manage players, track statistics, and oversee the Inter-University Cricket Tournament fantasy
-                    league.
+                    Create your dream team for the Inter-University Cricket Tournament and compete with other fantasy
+                    managers.
                   </p>
                 </div>
                 <div className="flex flex-col gap-2 min-[400px]:flex-row">
-                  <Button onClick={() => redirect("/admin/login")}>
-                    Admin Login <ArrowRight className="ml-2 h-4 w-4" />
+                  <Button onClick={() => router.push("/auth/login")}>
+                    Login <ArrowRight className="ml-2 h-4 w-4" />
+                  </Button>
+                  <Button variant="outline" onClick={() => router.push("/auth/signup")}>
+                    Sign Up
                   </Button>
                 </div>
               </div>
