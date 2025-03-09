@@ -23,10 +23,9 @@ export default function AdminLogin() {
     setLoading(true)
     setError("")
 
-    // In a real app, this would be an API call to verify credentials
-    // For demo purposes, using a simple check
+  
     if (username === "admin" && password === "password") {
-      // Simulate API delay
+      
       await new Promise((resolve) => setTimeout(resolve, 1000))
       router.push("/admin/dashboard")
     } else {

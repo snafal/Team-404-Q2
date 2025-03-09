@@ -1,6 +1,6 @@
-// Player types
+
 export type PlayerRole = "Batsman" | "Bowler" | "All-Rounder" | "Wicket Keeper"
-export type University = string // Changed to string to accommodate all universities in the dataset
+export type University = string
 
 export interface Player {
   id: string
@@ -8,7 +8,7 @@ export interface Player {
   university: University
   role: PlayerRole
   image?: string
-  value: number // in Rs.
+  value: number 
   points: number
 }
 
@@ -20,25 +20,25 @@ export interface PlayerStats {
   catches: number
   stumpings: number
   highestScore: number
-  bestBowling: string // Format: "3/25"
+  bestBowling: string 
   fifties: number
   hundreds: number
   economy: number
   strikeRate: number
   average: number
-  // New fields based on the CSV data
+
   ballsFaced: number
   inningsPlayed: number
   oversBowled: number
   runsConceded: number
-  // Calculated fields
+  
   battingStrikeRate: number
   battingAverage: number
   bowlingStrikeRate: number
   bowlingEconomy: number
 }
 
-// Sample data - will be replaced with CSV data
+
 export const players: Player[] = [
   {
     id: "1",
@@ -49,7 +49,7 @@ export const players: Player[] = [
     value: 1200000,
     points: 120,
   },
-  // Other players...
+  
 ]
 
 export const playerStats: PlayerStats[] = [
@@ -67,21 +67,21 @@ export const playerStats: PlayerStats[] = [
     economy: 0,
     strikeRate: 135.5,
     average: 45.0,
-    // New fields
+   
     ballsFaced: 350,
     inningsPlayed: 10,
     oversBowled: 0,
     runsConceded: 0,
-    // Calculated fields
+  
     battingStrikeRate: 128.57,
     battingAverage: 45.0,
     bowlingStrikeRate: 0,
     bowlingEconomy: 0,
   },
-  // Other player stats...
+  
 ]
 
-// Helper functions
+
 export function getPlayerById(id: string): Player | undefined {
   return players.find((player) => player.id === id)
 }
@@ -104,7 +104,7 @@ export function calculateBattingAverage(runs: number, inningsPlayed: number): nu
 
 // Calculate bowling strike rate
 export function calculateBowlingStrikeRate(ballsBowled: number, wickets: number): number {
-  if (wickets === 0) return 999 // High value to avoid division by zero
+  if (wickets === 0) return 999 
   return ballsBowled / wickets
 }
 
@@ -117,15 +117,15 @@ export function calculateBowlingEconomy(runsConceded: number, ballsBowled: numbe
 // Convert overs to balls
 export function oversToBalls(overs: number): number {
   const fullOvers = Math.floor(overs)
-  const partialOver = (overs - fullOvers) * 10 // Convert decimal part to balls (e.g., 0.4 overs = 4 balls)
+  const partialOver = (overs - fullOvers) * 10 
   return fullOvers * 6 + partialOver
 }
 
-// Calculate player points based on the provided formula
+
 export function calculatePlayerPoints(stats: PlayerStats): number {
   // Player Points = ((Batting Strike Rate / 5) + (Batting Average × 0.8)) + ((500 / Bowling Strike Rate) + (140 / Economy Rate))
 
-  // Calculate batting component
+ 
   const battingComponent = stats.battingStrikeRate / 5 + stats.battingAverage * 0.8
 
   // Calculate bowling component
@@ -134,28 +134,28 @@ export function calculatePlayerPoints(stats: PlayerStats): number {
     bowlingComponent = 500 / stats.bowlingStrikeRate + 140 / stats.bowlingEconomy
   }
 
-  // Sum components and round to nearest integer
+  
   return Math.round(battingComponent + bowlingComponent)
 }
 
-// Calculate player value based on points
+
 export function calculatePlayerValue(points: number): number {
   // Value in Rupees = (9 × Points + 100) × 1000
   return (9 * points + 100) * 1000
 }
 
-// Tournament summary calculations
+
 export function getTournamentSummary() {
   const totalRuns = playerStats.reduce((sum, stats) => sum + stats.runs, 0)
   const totalWickets = playerStats.reduce((sum, stats) => sum + stats.wickets, 0)
 
-  // Find highest run scorer
+ 
   const highestRunScorer = playerStats.reduce(
     (highest, current) => (current.runs > highest.runs ? current : highest),
     playerStats[0],
   )
 
-  // Find highest wicket taker
+ 
   const highestWicketTaker = playerStats.reduce(
     (highest, current) => (current.wickets > highest.wickets ? current : highest),
     playerStats[0],
@@ -175,15 +175,14 @@ export function getTournamentSummary() {
   }
 }
 
-// Function to fetch and parse CSV data
+
 export async function fetchAndParseCSVData(): Promise<{ players: Player[]; playerStats: PlayerStats[] }> {
   try {
-    const response = await fetch(
-      "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/sample_data-KC0sA9GJU8ZjAOwnh3rbCwkEaEuvlf.csv",
-    )
+    const response = await fetch("https://drive.google.com/uc?export=download&id=1P6Mu-sq1nzQ5-yAc8HgccgQfQnHTCV5v")
     const csvText = await response.text()
+    
 
-    // Parse CSV
+
     const rows = csvText.split("\n").filter((row) => row.trim() !== "")
     const headers = rows[0].split(",").map((header) => header.trim())
 
@@ -200,12 +199,12 @@ export async function fetchAndParseCSVData(): Promise<{ players: Player[]; playe
       }
     }
 
-    // Convert parsed data to our data model
+   
     const newPlayers: Player[] = []
     const newPlayerStats: PlayerStats[] = []
 
     parsedData.forEach((row, index) => {
-      // Map role from Category
+     
       let role: PlayerRole = "Batsman"
       if (row["Category"] === "All-Rounder") {
         role = "All-Rounder"
@@ -215,7 +214,7 @@ export async function fetchAndParseCSVData(): Promise<{ players: Player[]; playe
         role = "Wicket Keeper"
       }
 
-      // Calculate stats
+ 
       const totalRuns = Number.parseInt(row["Total Runs"]) || 0
       const ballsFaced = Number.parseInt(row["Balls Faced"]) || 0
       const inningsPlayed = Number.parseInt(row["Innings Played"]) || 0
@@ -230,18 +229,18 @@ export async function fetchAndParseCSVData(): Promise<{ players: Player[]; playe
       const bowlingStrikeRate = calculateBowlingStrikeRate(ballsBowled, wickets)
       const bowlingEconomy = calculateBowlingEconomy(runsConceded, ballsBowled)
 
-      // Create player stats object
+     
       const playerStats: PlayerStats = {
         playerId: (index + 1).toString(),
         matches: inningsPlayed,
         runs: totalRuns,
         wickets: wickets,
-        catches: 0, // Not in CSV
-        stumpings: 0, // Not in CSV
-        highestScore: 0, // Not in CSV
-        bestBowling: "0/0", // Not in CSV
-        fifties: 0, // Not in CSV
-        hundreds: 0, // Not in CSV
+        catches: 0, 
+        stumpings: 0,
+        highestScore: 0, 
+        bestBowling: "0/0", 
+        fifties: 0, 
+        hundreds: 0, 
         economy: bowlingEconomy,
         strikeRate: battingStrikeRate,
         average: battingAverage,
@@ -255,13 +254,13 @@ export async function fetchAndParseCSVData(): Promise<{ players: Player[]; playe
         bowlingEconomy: bowlingEconomy,
       }
 
-      // Calculate points using our formula
+      
       const points = calculatePlayerPoints(playerStats)
 
-      // Calculate value based on points
+     
       const value = calculatePlayerValue(points)
 
-      // Create player object
+    
       const player: Player = {
         id: (index + 1).toString(),
         name: row["Name"],

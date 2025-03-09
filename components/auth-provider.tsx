@@ -4,8 +4,8 @@ import { createContext, useContext, useEffect, useState, type ReactNode } from "
 import { useRouter, usePathname } from "next/navigation"
 
 type User = {
+  id: string
   username: string
-  isAuthenticated: boolean
   budget: number
   team: any[]
   teamPoints: number
@@ -14,23 +14,17 @@ type User = {
 type AuthContextType = {
   user: User | null
   login: (username: string, password: string) => Promise<void>
+  signup: (username: string, password: string) => Promise<void>
   logout: () => void
-  updateUser: (userData: Partial<User>) => void
-}
-
-const defaultUser: User = {
-  username: "",
-  isAuthenticated: false,
-  budget: 9000000,
-  team: [],
-  teamPoints: 0,
+  updateUser: (userData: Partial<User>) => Promise<void>
 }
 
 const AuthContext = createContext<AuthContextType>({
-  user: defaultUser,
+  user: null,
   login: async () => {},
+  signup: async () => {},
   logout: () => {},
-  updateUser: () => {},
+  updateUser: async () => {},
 })
 
 export const useAuth = () => useContext(AuthContext)
@@ -57,25 +51,60 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
       if (!user && !isAuthRoute) {
         router.push("/auth/login")
-      } else if (user?.isAuthenticated && isAuthRoute) {
+      } else if (user?.id && isAuthRoute) {
         router.push("/dashboard")
       }
     }
   }, [user, loading, pathname, router])
 
   const login = async (username: string, password: string) => {
-    // In a real app, this would validate credentials with an API
-    const newUser: User = {
-      username,
-      isAuthenticated: true,
-      budget: 9000000,
-      team: [],
-      teamPoints: 0,
-    }
+    try {
+      const response = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ username, password }),
+      })
 
-    setUser(newUser)
-    localStorage.setItem("user", JSON.stringify(newUser))
-    router.push("/dashboard")
+      if (!response.ok) {
+        const error = await response.json()
+        throw new Error(error.error || "Login failed")
+      }
+
+      const data = await response.json()
+      setUser(data.user)
+      localStorage.setItem("user", JSON.stringify(data.user))
+      router.push("/dashboard")
+    } catch (error) {
+      console.error("Login error:", error)
+      throw error
+    }
+  }
+
+  const signup = async (username: string, password: string) => {
+    try {
+      const response = await fetch("/api/auth/signup", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ username, password }),
+      })
+
+      if (!response.ok) {
+        const error = await response.json()
+        throw new Error(error.error || "Signup failed")
+      }
+
+      const data = await response.json()
+      setUser(data.user)
+      localStorage.setItem("user", JSON.stringify(data.user))
+      router.push("/dashboard")
+    } catch (error) {
+      console.error("Signup error:", error)
+      throw error
+    }
   }
 
   const logout = () => {
@@ -84,14 +113,37 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     router.push("/auth/login")
   }
 
-  const updateUser = (userData: Partial<User>) => {
-    if (user) {
-      const updatedUser = { ...user, ...userData }
-      setUser(updatedUser)
-      localStorage.setItem("user", JSON.stringify(updatedUser))
+  const updateUser = async (userData: Partial<User>) => {
+    if (user?.id) {
+      try {
+        const response = await fetch(`/api/users/${user.id}`, {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(userData),
+        })
+
+        if (!response.ok) {
+          const error = await response.json()
+          throw new Error(error.error || "Update failed")
+        }
+
+        const data = await response.json()
+        const updatedUser = data.user
+        setUser(updatedUser)
+        localStorage.setItem("user", JSON.stringify(updatedUser))
+      } catch (error) {
+        console.error("Update user error:", error)
+        throw error
+      }
     }
   }
 
-  return <AuthContext.Provider value={{ user, login, logout, updateUser }}>{!loading && children}</AuthContext.Provider>
+  return (
+    <AuthContext.Provider value={{ user, login, signup, logout, updateUser }}>
+      {!loading && children}
+    </AuthContext.Provider>
+  )
 }
 

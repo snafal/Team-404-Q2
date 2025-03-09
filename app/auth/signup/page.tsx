@@ -11,6 +11,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Label } from "@/components/ui/label"
 import { AlertCircle } from "lucide-react"
 import { Alert, AlertDescription } from "@/components/ui/alert"
+import { useAuth } from "@/components/auth-provider"
 
 export default function Signup() {
   const [username, setUsername] = useState("")
@@ -19,6 +20,7 @@ export default function Signup() {
   const [error, setError] = useState("")
   const [loading, setLoading] = useState(false)
   const router = useRouter()
+  const { signup } = useAuth()
 
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -26,38 +28,14 @@ export default function Signup() {
     setError("")
 
     try {
-      // Validate passwords match
+      
       if (password !== confirmPassword) {
-        setError("Passwords do not match")
-        setLoading(false)
-        return
+        throw new Error("Passwords do not match")
       }
 
-      // In a real app, this would be an API call to create a new user
-      // For demo purposes, using a simple check
-      if (username && password) {
-        // Simulate API delay
-        await new Promise((resolve) => setTimeout(resolve, 1000))
-
-        // Store user in localStorage for persistence
-        localStorage.setItem(
-          "user",
-          JSON.stringify({
-            username,
-            isAuthenticated: true,
-            budget: 9000000, // Initial budget of Rs.9,000,000
-            team: [],
-            teamPoints: 0,
-          }),
-        )
-
-        router.push("/dashboard")
-      } else {
-        setError("Please enter both username and password")
-      }
-    } catch (err) {
-      setError("An error occurred during signup")
-      console.error(err)
+      await signup(username, password)
+    } catch (err: any) {
+      setError(err.message || "An error occurred during signup")
     } finally {
       setLoading(false)
     }

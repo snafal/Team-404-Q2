@@ -11,6 +11,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Label } from "@/components/ui/label"
 import { AlertCircle } from "lucide-react"
 import { Alert, AlertDescription } from "@/components/ui/alert"
+import { useAuth } from "@/components/auth-provider"
 
 export default function Login() {
   const [username, setUsername] = useState("")
@@ -18,6 +19,7 @@ export default function Login() {
   const [error, setError] = useState("")
   const [loading, setLoading] = useState(false)
   const router = useRouter()
+  const { login } = useAuth()
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -25,31 +27,9 @@ export default function Login() {
     setError("")
 
     try {
-      // In a real app, this would be an API call to verify credentials
-      // For demo purposes, using a simple check
-      if (username && password) {
-        // Simulate API delay
-        await new Promise((resolve) => setTimeout(resolve, 1000))
-
-        // Store user in localStorage for persistence
-        localStorage.setItem(
-          "user",
-          JSON.stringify({
-            username,
-            isAuthenticated: true,
-            budget: 9000000, // Initial budget of Rs.9,000,000
-            team: [],
-            teamPoints: 0,
-          }),
-        )
-
-        router.push("/dashboard")
-      } else {
-        setError("Please enter both username and password")
-      }
-    } catch (err) {
-      setError("An error occurred during login")
-      console.error(err)
+      await login(username, password)
+    } catch (err: any) {
+      setError(err.message || "An error occurred during login")
     } finally {
       setLoading(false)
     }

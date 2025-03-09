@@ -15,7 +15,7 @@ import {
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Button } from "@/components/ui/button"
 import { Search, Filter, Info, Loader } from "lucide-react"
-import { type Player, type PlayerStats, fetchAndParseCSVData } from "@/lib/data"
+import type { Player, PlayerStats } from "@/lib/data"
 
 export default function PlayersPage() {
   const [players, setPlayers] = useState<Player[]>([])
@@ -33,13 +33,20 @@ export default function PlayersPage() {
     const loadData = async () => {
       setIsLoading(true)
       try {
-        const data = await fetchAndParseCSVData()
-        setPlayers(data.players)
-        setPlayerStats(data.playerStats)
+        // Fetch players from API
+        const playersResponse = await fetch("/api/players")
+        const playersData = await playersResponse.json()
+
+        // Fetch player stats from API
+        const statsResponse = await fetch("/api/player-stats")
+        const statsData = await statsResponse.json()
+
+        setPlayers(playersData.players)
+        setPlayerStats(statsData.playerStats)
 
         // Extract unique universities
-        const uniqueUniversities = Array.from(new Set(data.players.map((p) => p.university))).sort()
-        setUniversities(uniqueUniversities)
+        const uniqueUniversities = Array.from(new Set(playersData.players.map((p: Player) => p.university))).sort()
+        setUniversities(uniqueUniversities as string[])
       } catch (error) {
         console.error("Error loading data:", error)
       } finally {
@@ -59,14 +66,21 @@ export default function PlayersPage() {
   })
 
   // View player details
-  const handleViewPlayerDetails = (playerId: string) => {
-    const player = players.find((p) => p.id === playerId)
-    const stats = playerStats.find((s) => s.playerId === playerId)
+  const handleViewPlayerDetails = async (playerId: string) => {
+    try {
+      // Fetch player details from API
+      const playerResponse = await fetch(`/api/players/${playerId}`)
+      const playerData = await playerResponse.json()
 
-    if (player && stats) {
-      setCurrentPlayer(player)
-      setCurrentStats(stats)
+      // Fetch player stats from API
+      const statsResponse = await fetch(`/api/player-stats/${playerId}`)
+      const statsData = await statsResponse.json()
+
+      setCurrentPlayer(playerData.player)
+      setCurrentStats(statsData.playerStat)
       setIsPlayerDetailsOpen(true)
+    } catch (error) {
+      console.error("Error fetching player details:", error)
     }
   }
 
