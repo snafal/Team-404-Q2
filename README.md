@@ -319,9 +319,6 @@ If you encounter any issues not covered in this README, please:
 3. Create an issue in the GitHub repository with detailed information about the problem
 
 
-## License
-
-This project is licensed under the MIT License - see the LICENSE file for details.
 
 ## Acknowledgements
 
