@@ -1,4 +1,77 @@
-Thought for 1 second```markdown project="Spirit11 Project" file="README.md"
+# Spirit11 Fantasy Cricket
+
+A fantasy cricket platform for the Inter-University Cricket Tournament, allowing users to create teams, manage budgets, and compete on the leaderboard.
+
+## Table of Contents
+- [Overview](#overview)
+- [Guidelines for Stage 1](#guidelines-for-stage-1)
+- [Features](#features)
+- [Tech Stack](#tech-stack)
+- [Setup and Installation](#setup-and-installation)
+- [Running the Project](#running-the-project)
+- [Admin Panel](#admin-panel)
+- [User Interface](#user-interface)
+- [Assumptions Made](#assumptions-made)
+- [Additional Features](#additional-features)
+- [Project Structure](#project-structure)
+- [API Endpoints](#api-endpoints)
+- [Deployment](#deployment)
+- [Troubleshooting](#troubleshooting)
+
+## Overview
+
+Spirit11 is a fantasy cricket platform where users can create their dream team for the Inter-University Cricket Tournament. Users can select players within a budget, view detailed player statistics, and compete with other users on the leaderboard.
+
+## Guidelines for Stage 1
+
+For Stage 1 of the project, the following requirements have been implemented:
+
+- **Admin Panel**: Includes authentication, player management (CRUD operations), player statistics management, and tournament summary.
+- **User Interface**: Includes authentication, player browsing, team selection, budget tracking, and leaderboard.
+- **Data Management**: All players from the provided dataset are imported into the database.
+- **Calculations**: Player points and values are calculated using the provided formulas.
+- **Database**: MongoDB is used for data persistence.
+- **Predefined User**: A specific user account with predefined credentials and team has been created.
+
+## Features
+
+### Admin Features
+- Admin authentication
+- Player management (CRUD operations)
+- Player statistics management
+- Tournament summary with visualizations
+
+### User Features
+- User authentication (signup/login)
+- Browse all players and view detailed statistics
+- Select players for your fantasy team
+- Track your budget and spending
+- View your team composition
+- Compete on the leaderboard
+
+## Tech Stack
+
+- **Frontend**: Next.js, React, TypeScript, Tailwind CSS, shadcn/ui
+- **Backend**: Next.js API Routes
+- **Database**: MongoDB
+- **State Management**: React Context API
+- **Data Visualization**: Recharts
+- **Authentication**: Custom authentication system
+
+## Setup and Installation
+
+### Prerequisites
+
+- Node.js (v18 or higher)
+- npm or yarn
+- MongoDB Atlas account (or local MongoDB installation)
+
+### Installation Steps
+
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/yourusername/spirit11.git
+   cd spirit11
 ...
 ```
 
